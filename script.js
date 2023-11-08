@@ -19,7 +19,7 @@ const projection = d3.geoMercator().center([0, 55.4])
 const pathGenerator = d3.geoPath().projection(projection);
 
 function fetchData() {
-    d3.json(`http://34.38.72.236/Circles/Towns/${10}`, function (err, data) {
+    d3.json(`http://34.38.72.236/Circles/Towns/${data_size}`, function (err, data) {
         const circle = map_g.selectAll("circle")
             .data(data, (d) => d.County)
         total_UK_Population = data.reduce((s, c) => s + c.Population, 0)
