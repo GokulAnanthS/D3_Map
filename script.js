@@ -8,6 +8,10 @@ const svg = d3.select('body')
 
 const map_g = svg.append('g');
 
+svg.call(d3.zoom().on('zoom', () => {
+    map_g.attr('transform', d3.event.transform);
+}))
+
 const projection = d3.geoMercator().center([0, 55.4])
     .scale(1400)
     .translate([375, 250]);
