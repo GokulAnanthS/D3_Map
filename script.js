@@ -1,5 +1,5 @@
 
-
+var data_size;
 
 const svg = d3.select('body')
     .append('svg')
@@ -18,6 +18,36 @@ const projection = d3.geoMercator().center([0, 55.4])
 
 const pathGenerator = d3.geoPath().projection(projection);
 
+function fetchData() {
+    d3.json(`http://34.38.72.236/Circles/Towns/${10}`, function (err, data) {
+        const circle = map_g.selectAll("circle")
+            .data(data, (d) => d.County)
+        total_UK_Population = data.reduce((s, c) => s + c.Population, 0)
+        console.log(data);
+        circle.exit().transition().attr('r', '0').remove();
+        circle.enter()
+            .append("circle")
+            .attr("cx", (d) => projection([d.lng, d.lat])[0])
+            .attr("cy", (d) => projection([d.lng, d.lat])[1])
+            .attr('r', (d) => d.Population * 0.00005)
+            .attr('class', 'circle_state')
+            .attr("fill", "#ff5e5b")
+            .attr('opacity', 0.5)
+            .append('title').text(d => `County : ${d.County}\nTown : ${d.Town}\nPopulation : ${d.Population}`)
+        circle
+            .transition().duration(500)
+            .attr("cx", (d) => projection([d.lng, d.lat])[0])
+            .attr("cy", (d) => projection([d.lng, d.lat])[1])
+            .transition().duration(500)
+            .attr('r', (d) => d.Population * 0.00005)
+            .attr('class', 'circle_state')
+            .attr("fill", "#ff5e5b")
+            .attr('opacity', 0.5);
+        circle.exit().transition().duration(1000).attr('r', '0').remove();
+    })
+}
+
+
 function drawMap() {
     d3.json('smix.geojson', function (err, data) {
         const paths = map_g.selectAll('path');
@@ -28,6 +58,16 @@ function drawMap() {
             .attr('class', 'map_state')
             .append('title')
             .text(d => d.properties.LPA23NM.slice(0, -4));
+        const input = document.querySelector(".slider");
+        // var dataCount = document.querySelector(".dataCount");
+
+        input.addEventListener("click", (event) => {
+            data_size = event.target.value;
+            // dataCount.innerHTML = `You've fetched ${data_size} data..!`;
+            console.log(data_size);
+            fetchData(data_size);
+
+        });
     });
 }
 
@@ -46,12 +86,13 @@ function createControl() {
 function refreshButton() {
     const button = document.createElement("button");
     button.setAttribute("type", "button");
-    button.setAttribute("class", "refresh")
+    button.setAttribute("onclick", "fetchData()");
+    button.setAttribute("class", "refresh");
     button.innerHTML = "Refresh";
     return button;
 }
 
-function createSlider(divTag) {
+function createSlider() {
     const inputTag = document.createElement("input");
     inputTag.setAttribute("type", "range");
     inputTag.setAttribute("min", "0")
