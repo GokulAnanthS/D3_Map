@@ -30,7 +30,7 @@ svg.call(d3.zoom().scaleExtent([1, 5]).on('zoom', () => {
 
 }));
 
-const projection = d3.geoMercator().center([0, 55.4])
+const projection = d3.geoMercator().center([3, 56.5])
     .scale(1400)
     .translate([375, 250]);
 
@@ -91,10 +91,9 @@ function drawMap() {
         input.addEventListener("click", (event) => {
             data_size = event.target.value;
             // dataCount.innerHTML = `You've fetched ${data_size} data..!`;
-            console.log(data_size);
-            fetchData(data_size);
-
+            fetchData();
         });
+        fetchData();
     });
 }
 
@@ -124,7 +123,7 @@ function createSlider() {
     inputTag.setAttribute("type", "range");
     inputTag.setAttribute("min", "0")
     inputTag.setAttribute("max", "500")
-    inputTag.setAttribute("value", "20")
+    inputTag.setAttribute("value", "10")
     inputTag.setAttribute("class", "slider")
     return inputTag;
 }
