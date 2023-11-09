@@ -12,7 +12,7 @@ const plot_g = svg_g.append('g');
 
 let currentTransform = d3.zoomIdentity;
 
-svg.call(d3.zoom().on('zoom', () => {
+svg.call(d3.zoom().scaleExtent([1, 5]).on('zoom', () => {
 
     currentTransform = d3.event.transform;
 
