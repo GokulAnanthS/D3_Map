@@ -17,25 +17,21 @@ const projection = d3.geoMercator().center([0, 55.4])
     .translate([375, 250]);
 
 const pathGenerator = d3.geoPath().projection(projection);
-
 function fetchData() {
     d3.json(`http://34.38.72.236/Circles/Towns/${data_size}`, function (err, data) {
-        const circle = map_g.selectAll("circle")
-            .data(data, (d) => d.County)
-        total_UK_Population = data.reduce((s, c) => s + c.Population, 0)
-        console.log(data);
-        circle.exit().transition().attr('r', '0').remove();
-        circle.enter()
+        const circle = map_g.selectAll(".circle_state")
+            .data(data, (d) => d.County);
+
+        circle.exit().transition()
+            .duration(1000)
+            .attr('r', 0)
+            .remove();
+
+        const updatedCircles = circle.enter()
             .append("circle")
-            .attr("cx", (d) => projection([d.lng, d.lat])[0])
-            .attr("cy", (d) => projection([d.lng, d.lat])[1])
-            .attr('r', (d) => d.Population * 0.00005)
-            .attr('class', 'circle_state')
-            .attr("fill", "#ff5e5b")
-            .attr('opacity', 0.5)
-            .append('title').text(d => `County : ${d.County}\nTown : ${d.Town}\nPopulation : ${d.Population}`)
-        circle
-            .transition().duration(500)
+            .merge(circle);
+
+        updatedCircles.transition().duration(500)
             .attr("cx", (d) => projection([d.lng, d.lat])[0])
             .attr("cy", (d) => projection([d.lng, d.lat])[1])
             .transition().duration(500)
@@ -43,8 +39,12 @@ function fetchData() {
             .attr('class', 'circle_state')
             .attr("fill", "#ff5e5b")
             .attr('opacity', 0.5);
-        circle.exit().transition().duration(1000).attr('r', '0').remove();
-    })
+
+        updatedCircles.selectAll('title').remove();
+        updatedCircles.append('title')
+            .attr('class', 'circle_title')
+            .text((d) => `County : ${d.County}\nTown : ${d.Town}\nPopulation : ${d.Population}`);
+    });
 }
 
 
@@ -97,7 +97,7 @@ function createSlider() {
     inputTag.setAttribute("type", "range");
     inputTag.setAttribute("min", "0")
     inputTag.setAttribute("max", "500")
-    inputTag.setAttribute("value", "0")
+    inputTag.setAttribute("value", "20")
     inputTag.setAttribute("class", "slider")
     return inputTag;
 }
