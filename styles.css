@@ -1,0 +1,15 @@
+.map_state:hover {
+    fill: #b1a7a6;
+
+}
+
+.circle_state:hover {
+    fill: #F45B69;
+    opacity: 1;
+}
+
+svg {
+    background-color: #91C8E4;
+    stroke: #b1a7a6;
+    stroke-width: 0.15px;
+}

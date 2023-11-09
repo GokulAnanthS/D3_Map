@@ -6,20 +6,40 @@ const svg = d3.select('body')
     .attr("width", "500px")
     .attr("height", "600px");
 
-const map_g = svg.append('g');
+const svg_g = svg.append('g');
+const map_g = svg_g.append('g');
+const plot_g = svg_g.append('g');
+
+let currentTransform = d3.zoomIdentity;
 
 svg.call(d3.zoom().on('zoom', () => {
-    map_g.attr('transform', d3.event.transform);
-}))
+
+    currentTransform = d3.event.transform;
+
+    map_g.attr('transform', currentTransform);
+
+    plot_g.selectAll(".circle_state")
+        .attr("cx", (d) => {
+            const [x, y] = projection([d.lng, d.lat]);
+            return d3.event.transform.applyX(x);
+        })
+        .attr("cy", (d) => {
+            const [x, y] = projection([d.lng, d.lat]);
+            return d3.event.transform.applyY(y);
+        });
+
+}));
 
 const projection = d3.geoMercator().center([0, 55.4])
     .scale(1400)
     .translate([375, 250]);
 
 const pathGenerator = d3.geoPath().projection(projection);
+
+
 function fetchData() {
     d3.json(`http://34.38.72.236/Circles/Towns/${data_size}`, function (err, data) {
-        const circle = map_g.selectAll(".circle_state")
+        const circle = plot_g.selectAll(".circle_state")
             .data(data, (d) => d.County);
 
         circle.exit().transition()
@@ -32,12 +52,18 @@ function fetchData() {
             .merge(circle);
 
         updatedCircles.transition().duration(500)
-            .attr("cx", (d) => projection([d.lng, d.lat])[0])
-            .attr("cy", (d) => projection([d.lng, d.lat])[1])
+            .attr("cx", (d) => {
+                const [x, y] = projection([d.lng, d.lat]);
+                return currentTransform.applyX(x);
+            })
+            .attr("cy", (d) => {
+                const [x, y] = projection([d.lng, d.lat]);
+                return currentTransform.applyY(y);
+            })
             .transition().duration(500)
             .attr('r', (d) => d.Population * 0.00005)
             .attr('class', 'circle_state')
-            .attr("fill", "#ff5e5b")
+            .attr("fill", "#F45B69")
             .attr('opacity', 0.5);
 
         updatedCircles.selectAll('title').remove();
@@ -53,12 +79,13 @@ function drawMap() {
         const paths = map_g.selectAll('path');
         paths.data(data.features).enter().append('path')
             .attr("class", function (d, i) { return "subunit_" + i; })
-            .attr("fill", "#d3d3d3")
+            .attr("fill", "#F6F4EB")
             .attr('d', d => pathGenerator(d))
             .attr('class', 'map_state')
             .append('title')
             .text(d => d.properties.LPA23NM.slice(0, -4));
         const input = document.querySelector(".slider");
+
         // var dataCount = document.querySelector(".dataCount");
 
         input.addEventListener("click", (event) => {
