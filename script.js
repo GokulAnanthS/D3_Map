@@ -4,6 +4,7 @@ var svg_width = 650;
 var svg_height = 650;
 var transition_duration = 700;
 var map_size = 1600
+var population;
 
 // capturing current zoom Identity for plotting in same zoom level
 let currentTransform = d3.zoomIdentity;
@@ -58,6 +59,8 @@ function fetchData() {
 
         // Error Handling
         if (err) throw err;
+
+        population = data;
 
         // Creating circle 
         const circle = plot_g.selectAll(".circle_state")
